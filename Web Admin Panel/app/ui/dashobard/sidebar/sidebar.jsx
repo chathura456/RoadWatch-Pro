@@ -2,15 +2,14 @@
 
 import {
   MdAdminPanelSettings,
-  MdAttachMoney,
-  MdBikeScooter,
   MdCloudUpload,
   MdDashboard,
-  MdLocalShipping,
-  MdLocalTaxi,
+  MdEditLocation,
+  MdInfo,
   MdLogout,
-  MdOutlineAttachMoney,
-  MdOutlineSettings
+  MdManageHistory,
+  MdOutlineSettings,
+  MdVideoCameraBack
 } from "react-icons/md"; // Ensure react-icons is installed
 
 import MenuLink from "@/app/ui/dashobard/sidebar/menuLink/menuLink";
@@ -33,37 +32,33 @@ const menuItems = [
         icon: <MdCloudUpload />,
       },
       {
-        title: "Riders",
-        path: "/dashboard/riders",
-        icon: <MdBikeScooter />,
+        title: "History",
+        path: "/dashboard/history",
+        icon: <MdManageHistory />,
       },
       {
-        title: "Taxi Bookings",
-        path: "/dashboard/taxi_bookings",
-        icon: <MdLocalTaxi />,
+        title: "Manage Cameras",
+        path: "/dashboard/cameras",
+        icon: <MdVideoCameraBack />,
       },
       {
-        title: "Package Delivery",
-        path: "/dashboard/package_delivery",
-        icon: <MdLocalShipping />,
+        title: "Manage Areas",
+        path: "/dashboard/areas",
+        icon: <MdEditLocation />,
       },
       {
-        title: "Charges",
-        path: "/dashboard/charges",
-        icon: <MdAttachMoney />,
+        title: "GuideLines",
+        path: "/dashboard/guidelines",
+        icon: <MdInfo />,
       },
-      {
-        title: "Transactions",
-        path: "/dashboard/transactions",
-        icon: <MdOutlineAttachMoney />,
-      },
+
     ],
   },
   {
     title: "UserSettings",
     list: [
       {
-        title: "Admin Users",
+        title: "Manage Users",
         path: "/dashboard/admin_users",
         icon: <MdAdminPanelSettings />,
       },

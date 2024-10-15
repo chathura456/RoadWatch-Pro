@@ -1,82 +1,159 @@
-"use client"
-import { InferenceEngine } from "inferencejs"; // Use inferencejs
-import { useEffect, useRef, useState } from "react";
+"use client";
+import axios from "axios";
+import { useState } from "react";
+import styles from "./uploader.module.css";
 
 const Uploader = () => {
-  const videoRef = useRef(null); // Reference to video element
-  const canvasRef = useRef(null); // Reference to canvas element
-  const [workerId, setWorkerId] = useState(null); // Store the inference worker ID
-  const [inferEngine, setInferEngine] = useState(null); // Inference engine state
+  const [imageFile, setImageFile] = useState(null);
+  const [result, setResult] = useState(null);
+  const [violations, setViolations] = useState([]);
+  const [annotatedImage, setAnnotatedImage] = useState(null);
+  const [loading, setLoading] = useState(false); // State to track loading
 
-  useEffect(() => {
-    const engine = new InferenceEngine();
-    engine
-      .startWorker("bike-helmet-detection-2vdjo", 2, "rf_SfWTdKgHlnMiJxXq4QfTTRQxjXF2") // Public model
-      .then((id) => {
-        setWorkerId(id);
-        setInferEngine(engine); // Save engine instance
-      })
-      .catch((error) => {
-        console.error("Error loading model:", error);
-      });
-  }, []);
-  
-  const handleVideoUpload = (event) => {
-    const file = event.target.files[0];
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+  const handleFileChange = (event) => {
+    setImageFile(event.target.files[0]);
+  };
 
-    if (file) {
-      const fileURL = URL.createObjectURL(file);
-      video.src = fileURL;
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append("file", imageFile);
 
-      video.onloadedmetadata = () => {
-        video.play();
-        detectFrame(video, canvas, ctx); // Start detecting on frames
-      };
+    setLoading(true); // Set loading to true when detecting violations
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/detect",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      // Check if the necessary data is in the response
+      if (response.data && response.data.data) {
+        const predictions = response.data.data.predictions || [];
+        const filteredViolations = predictions.filter(
+          (prediction) => prediction.class === "Without Helmet"
+        );
+        setResult(response.data.data);
+        setViolations(filteredViolations);
+
+        // Ensure image is correctly formatted for display
+        if (response.data.image) {
+          setAnnotatedImage(`data:image/jpeg;base64,${response.data.image}`);
+        } else {
+          console.error("No image found in response:", response.data);
+          setAnnotatedImage(null);
+        }
+      } else {
+        console.error("No data found in response:", response.data);
+        setResult(null);
+        setViolations([]);
+        setAnnotatedImage(null);
+      }
+    } catch (error) {
+      console.error("Error detecting violations:", error);
+    } finally {
+      setLoading(false); // Set loading to false after request completes
     }
   };
 
-  const detectFrame = (video, canvas, ctx) => {
-    if (workerId && inferEngine) {
-      const image = videoRef.current;
+  const handleReset = () => {
+    setImageFile(null);
+    setResult(null);
+    setViolations([]);
+    setAnnotatedImage(null);
+    setLoading(false); // Reset loading state
+  };
 
-      // Perform inference on each frame
-      inferEngine.infer(workerId, image).then((predictions) => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous frame
-
-        predictions.forEach((prediction) => {
-          const { x, y, width, height } = prediction.bbox;
-          const confidence = (prediction.confidence * 100).toFixed(2);
-
-          // Draw bounding boxes
-          ctx.strokeStyle = "green";
-          ctx.lineWidth = 2;
-          ctx.strokeRect(x, y, width, height);
-
-          // Draw labels and confidence
-          ctx.font = "18px Arial";
-          ctx.fillStyle = "red";
-          ctx.fillText(
-            `${prediction.class} (${confidence}%)`,
-            x,
-            y > 20 ? y - 10 : y + 20
-          );
-        });
-
-        // Call the next frame
-        requestAnimationFrame(() => detectFrame(video, canvas, ctx));
-      });
-    }
+  const isImageOrVideo = (file) => {
+    const fileType = file?.type;
+    return fileType?.startsWith("image/") || fileType?.startsWith("video/");
   };
 
   return (
-    <div>
-      <h1>Upload a Video File for Helmet Detection</h1>
-      <input type="file" accept="video/*" onChange={handleVideoUpload} />
-      <video ref={videoRef} width="640" height="480" controls />
-      <canvas ref={canvasRef} width="640" height="480" />
+    <div className={styles.container}>
+      {/* Upload Card */}
+      <div className={styles.uploadCard}>
+        <h2 className={styles.h2}>Upload Image or Video</h2>
+        {!imageFile ? (
+          <div className={styles.placeholder}>
+            <p>
+              Please select an image or video to upload for violation detection.
+            </p>
+          </div>
+        ) : (
+          <>
+            <p>File selected: {imageFile.name}</p>
+            <div className={styles.mediaContainer}>
+              {isImageOrVideo(imageFile) &&
+                (imageFile.type.startsWith("image/") ? (
+                  <img
+                    src={URL.createObjectURL(imageFile)}
+                    alt="Uploaded media"
+                    className={styles.previewMedia}
+                  />
+                ) : (
+                  <video
+                    src={URL.createObjectURL(imageFile)}
+                    controls
+                    className={styles.previewMedia}
+                  />
+                ))}
+            </div>
+          </>
+        )}
+        <form onSubmit={handleSubmit} className={styles.formContainer}>
+        <input type="file"  onChange={handleFileChange} />
+    <div className={styles.inputContainer}>
+        
+        <div className={styles.buttonContainer}>
+            <button className={styles.button} type="submit" disabled={loading}>
+                {loading ? 'Detecting...' : 'Detect Violations'}
+            </button>
+            <button type="button" className={styles.button} onClick={handleReset}>
+                Reset
+            </button>
+        </div>
+    </div>
+</form>
+
+
+      </div>
+
+      {/* Result Card */}
+      <div className={styles.resultCard}>
+        <h2 className={styles.h2}>Detection Results</h2>
+        {!result ? (
+          <div className={styles.placeholder}>
+            <p>
+              Results will be displayed here after the detection is complete.
+            </p>
+          </div>
+        ) : (
+          <>
+            {violations.length > 0 ? (
+              <div className={styles.results}>
+                <h3>Violation Detected</h3>
+                <p>Persons without helmet: {violations.length}</p>
+                {/* Display the annotated image on the left side */}
+                {annotatedImage && (
+                  <img
+                    src={annotatedImage}
+                    alt="Annotated image"
+                    className={styles.annotatedImage}
+                  />
+                )}
+              </div>
+            ) : (
+              <p>No violations detected.</p>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };

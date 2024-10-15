@@ -51,6 +51,10 @@ margin-bottom: 20px;
     width: max-content;
 }
 
+.icon{
+    margin-right: 5px;
+}
+
 .subtitle{
     font-size: 12px;
     font-weight: bold;

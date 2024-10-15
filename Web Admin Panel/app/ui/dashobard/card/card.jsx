@@ -1,14 +1,18 @@
-import { MdSupervisedUserCircle } from 'react-icons/md';
 import styles from './card.module.css';
 
-const Card = () => {
+const Card = ({ icon, title, number, details, isPositive }) => {
   return (
     <div className={styles.container}>
-      <MdSupervisedUserCircle size={24}/>
+      {icon}
       <div className={styles.texts}>
-        <span className={styles.title}>Total Users</span>
-        <span className={styles.number}>14,258</span>
-        <span className={styles.details}><span className={styles.positive}>12%</span> more then previous week</span>
+        <span className={styles.title}>{title}</span>
+        <span className={styles.number}>{number}</span>
+        <span className={styles.details}>
+          <span className={isPositive ? styles.positive : styles.negative}>
+            {isPositive ? `${details}% more` : `${details}% less`}
+          </span>{' '}
+          than previous week
+        </span>
       </div>
     </div>
   );

@@ -1,18 +1,21 @@
 import Image from "next/image";
-import styles from "./income.module.css";
-import avatar from "/public/avatar.jpg";
+import styles from "./latest.module.css";
+import wheel from "/public/vehicles/3wheel.jpg";
+import bike from "/public/vehicles/bike.jpg";
+import car from "/public/vehicles/car.jpg";
+import van from "/public/vehicles/van.jpg";
 
-const Income = () => {
+const Latest = () => {
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Latest Transactions</h2>
+      <h2 className={styles.title}>Identified Violations</h2>
       <table className={styles.table}>
         <thead>
           <tr>
-            <td>Name</td>
-            <td>Status</td>
-            <td>Date</td>
-            <td>Amount</td>
+            <td>Vehicle No</td>
+            <td>Vehicle Type</td>
+            <td>Violation</td>
+            <td>Area</td>
           </tr>
         </thead>
         <tbody>
@@ -20,85 +23,86 @@ const Income = () => {
             <td>
               <div className={styles.user}>
               <Image
-                src={avatar}
+                src={bike}
                 alt=""
                 width={40}
                 height={40}
                 className={styles.userImage}
               />
-              John Doe
+              KD-4785
               </div>
             </td>
             <td>
               <span className={`${styles.status} ${styles.pending}`}>
-                Pending
+                Motorcycle
               </span>
             </td>
-            <td>14.02.2024</td>
-            <td>$3,200</td>
+            <td>No Helmet</td>
+            <td>Battaramulla</td>
           </tr>
           <tr>
             <td>
             <div className={styles.user}>
               <Image
-                src={avatar}
+                src={wheel}
                 alt=""
                 width={40}
                 height={40}
                 className={styles.userImage}
               />
-              Bill Adams
+              VH-7859
               </div>
             </td>
             <td>
               <span className={`${styles.status} ${styles.cancelled}`}>
-                Cancelled
+                Three Wheeler
               </span>
             </td>
-            <td>14.02.2024</td>
-            <td>$3,200</td>
+            <td>White Line Cross</td>
+            <td>Colombo 07</td>
           </tr>
           <tr>
             <td>
             <div className={styles.user}>
               <Image
-                src={avatar}
+                src={van}
                 alt=""
                 width={40}
                 height={40}
                 className={styles.userImage}
               />
-              Mike Jones
+              MN-1426
               </div>
             </td>
             <td>
               <span className={`${styles.status} ${styles.done}`}>
-                Done
+                Van
               </span>
             </td>
-            <td>14.02.2024</td>
-            <td>$3,200</td>
+            <td>High Speed</td>
+            <td>Highway E-01</td>
           </tr>
           <tr>
             <td>
             <div className={styles.user}>
               <Image
-                src={avatar}
+                src={car}
                 alt=""
                 width={40}
                 height={40}
+              
                 className={styles.userImage}
               />
-              Ann Parker
+              QV-6532
               </div>
             </td>
             <td>
               <span className={`${styles.status} ${styles.pending}`}>
-                Pending
+                Motorcycle
               </span>
             </td>
-            <td>14.02.2024</td>
-            <td>$3,200</td>
+            <td>No Helmet</td>
+            <td>Nugegoda</td>
           </tr>
         </tbody>
       </table>
@@ -106,4 +110,4 @@ const Income = () => {
   );
 };
 
-export default Income;
+export default Latest;

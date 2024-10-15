@@ -29,6 +29,8 @@
 .userImage{
     object-fit: cover;
     border-radius: 50%;
+  width: 40px; /* Added px unit */
+  height: 40px; /* Added px unit */
 }
 
 .status{
